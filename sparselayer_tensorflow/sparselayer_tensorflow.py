@@ -114,6 +114,9 @@ class SparseLayerDense(tf.keras.layers.Layer):
             out = self.activation(out) 
         return out
 
+    def compute_output_shape(self, input_shape):
+        return (input_shape[0], self.units)
+
 
 
 
@@ -144,8 +147,18 @@ class SparseLayerConv2D(tf.keras.layers.Layer):
 
     def build(self, input_shape):
         self.in_features = int(input_shape[-1] * self.filter_size[0] * self.filter_size[1])
-        self.H = input_shape[-3]
-        self.W = input_shape[-2]
+
+        if self.padding == "VALID":
+            P = [0, 0]
+        elif self.padding == "SAME":
+            P = [self.filter_size[0] - 1, self.filter_size[1] - 1]
+        else:
+            raise NameError('padding must be "SAME" or "VALID"')
+
+
+        self.H = (input_shape[-3] - self.filter_size[0] + 2 * P[0]) / self.stride[0] + 1
+        self.W = (input_shape[-2] - self.filter_size[1] + 2 * P[1]) / self.stride[1] + 1
+
 
         n_parameters = self.in_features * self.n_filters
         
@@ -241,3 +254,7 @@ class SparseLayerConv2D(tf.keras.layers.Layer):
         if self.activation is not None:
             out = self.activation(out) 
         return tf.reshape(out, (-1, self.H, self.W, self.n_filters))
+
+
+    def compute_output_shape(self, input_shape):
+        return (input_shape[0], self.H, self.W, self.n_filters)
