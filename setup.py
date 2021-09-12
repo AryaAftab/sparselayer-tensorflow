@@ -15,7 +15,7 @@ def read_file(*parts):
 setup(
   name = 'sparselayer-tensorflow',
   packages = find_packages(),
-  version = '0.0.1',
+  version = '0.0.2',
   license='MIT',
   description = 'Tensorflow 2.X implementation of Sparse Layer.',
   long_description=read_file('README.md'),
